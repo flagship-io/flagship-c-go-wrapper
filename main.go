@@ -37,6 +37,8 @@ func main() {
 func initFlagship(environmentID *C.char, apiKey *C.char, polling C.int, logLevel *C.char) {
 	var err error
 
+	log.Println("------------ initFlagship from GO wrapper library ------------ ")
+
 	switch C.GoString(logLevel) {
 	case "debug":
 		logging.SetLevel(logrus.DebugLevel)
@@ -92,4 +94,11 @@ func getAllFlags(visitorID *C.char, contextString *C.char) *C.char {
 	}
 
 	return C.CString(flagsString)
+}
+
+//export getVisitorContext
+func getVisitorContext(){
+
+	log.Println("------------ getVisitorContext ------------ ")
+
 }

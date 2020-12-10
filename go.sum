@@ -6,6 +6,7 @@ github.com/DataDog/sketches-go v0.0.0-20190923095040-43f19ad77ff7/go.mod h1:Q5Db
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/abtasty/flagship-go-sdk v1.0.0 h1:07mL2ywudvBnOh3DE4oMpWmh2VEO7jezCMDK9PgFkUM=
 github.com/abtasty/flagship-go-sdk v1.0.0/go.mod h1:lCBS0v6F96lYsSxSgvLpSqlYCFw/rM7lMwOlTwG+p3Q=
+github.com/abtasty/flagship-go-sdk/v2 v2.0.0 h1:000c2oM9ypM9d9RNeWZtmCkPXAVngIlGXzr9uzCZaSo=
 github.com/abtasty/flagship-go-sdk/v2 v2.0.0/go.mod h1:RvjJ76os/+xoefGkPtb6qMLGBq+aj2Z6d4w0lr5lvdk=
 github.com/abtasty/flagship-go-sdk/v2 v2.0.2 h1:Dkh8lle5TAY/BQffgMFA8EMxv8hhV8+cagb3knDwkx4=
 github.com/abtasty/flagship-go-sdk/v2 v2.0.2/go.mod h1:gxu2mvCZV0P4vMpNtE7PwF1d8DU9sCzhFcJzn0tWiUw=
