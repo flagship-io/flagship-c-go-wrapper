@@ -225,7 +225,7 @@ func getAllCFlags(visitorID *C.char, contextString *C.char) C.struct_FSModificat
 			//fmt.Println("&&&&&&&&&&& Boolean &&&&&&&&&&&&&&:\n", v)
 			typeData = 3
 		default:
-			fmt.Println("unknown value for the key: ", k)
+			fmt.Println("unknown value for the key: ", v)
 		}
 
 		slicePointer[i].varType = C.int(typeData)
