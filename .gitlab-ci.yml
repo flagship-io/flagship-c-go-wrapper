@@ -5,7 +5,7 @@ stages:
   - build
   - analyze
 
-build_docker_preprod:
+build_libraries:
   image: docker:latest
   stage: build
   variables:
@@ -13,7 +13,7 @@ build_docker_preprod:
   services:
     - docker:dind
   script:
-    - docker build -t builder
+    - docker build -t builder .
     - docker run --rm -v $(pwd):/root builder
   artifacts:
     paths:
