@@ -5,16 +5,30 @@ stages:
   - build
   - analyze
 
+build_docker:
+  image: docker:latest
+  stage: build
+  variables:
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:latest
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build -t $IMAGE_TAG .
+    - docker push $IMAGE_TAG
+  only:
+    - base
+
 build_libraries:
   image: docker:latest
   stage: build
   variables:
-    IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:latest
   services:
     - docker:dind
   script:
-    - docker build -t builder .
-    - docker run --rm -v $(pwd):/root builder
+    - docker run --rm -v $(pwd):/root $CI_REGISTRY_IMAGE:latest
   artifacts:
     paths:
       - build/*
