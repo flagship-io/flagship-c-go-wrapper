@@ -1,0 +1,22 @@
+######### MAIN ############
+
+### stages ###
+stages:
+  - build
+  - analyze
+
+build_docker_preprod:
+  image: docker:latest
+  stage: build
+  variables:
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+  services:
+    - docker:dind
+  script:
+    - docker build -t builder
+    - docker run --rm -v $(pwd):/root builder
+  artifacts:
+    paths:
+      - build/*
+  only:
+    - master
