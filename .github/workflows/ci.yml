@@ -5,16 +5,21 @@ on:
   pull_request:
 
 jobs:
-  xgo:
+  build-libraries:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     runs-on: ubuntu-latest
     container: neilotoole/xcgo:latest
     steps:
+      - uses: actions/checkout@v3
+
       - name: sudo
         run: sudo su
 
       - name: build libs
         run: ./entrypoint.sh
-      
+
       - uses: actions/upload-artifact@v3
         with:
           name: build
