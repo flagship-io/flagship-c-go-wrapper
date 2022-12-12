@@ -6,9 +6,6 @@ on:
 
 jobs:
   build-libraries:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
     runs-on: ubuntu-latest
     container: neilotoole/xcgo:latest
     steps:
@@ -24,3 +21,12 @@ jobs:
         with:
           name: build
           path: build/
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        #if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            build/linux
+            build/windows
+            build/darwin
