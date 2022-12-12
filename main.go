@@ -47,20 +47,13 @@ func main() {
 
 //export initFlagship
 func initFlagship(environmentID *C.char, apiKey *C.char, polling C.int, logLevel *C.char, trackingEnabled C.int) {
-	var err error
-
-	switch C.GoString(logLevel) {
-	case "debug":
-		logging.SetLevel(logrus.DebugLevel)
-	case "info":
-		logging.SetLevel(logrus.InfoLevel)
-	case "warn":
-		logging.SetLevel(logrus.WarnLevel)
-	case "error":
-		logging.SetLevel(logrus.ErrorLevel)
-	default:
-		logging.SetLevel(logrus.WarnLevel)
+	level, err := logrus.ParseLevel(C.GoString(logLevel))
+	if err != nil {
+		fmt.Printf("err: %s\n", err)
+		os.Exit(1)
 	}
+
+	logging.SetLevel(level)
 
 	// set bucketing options with custom polling interval
 	options := []client.OptionBuilder{
@@ -79,8 +72,16 @@ func initFlagship(environmentID *C.char, apiKey *C.char, polling C.int, logLevel
 	}
 }
 
-//export getAllFlags
-func getAllFlags(visitorID *C.char, contextString *C.char) *C.char {
+func createVisitor(visitorID *C.char, contextString *C.char) *client.Visitor {
+	fsVisitor, err := fsClient.NewVisitor(C.GoString(visitorID), extractContext(contextString))
+	if err != nil {
+		fmt.Printf("err: %s\n", err)
+		os.Exit(1)
+	}
+	return fsVisitor
+}
+
+func extractContext(contextString *C.char) map[string]interface{} {
 	context := map[string]interface{}{}
 	contextInfos := strings.Split(C.GoString(contextString), ";")
 	for _, cKV := range contextInfos {
@@ -89,13 +90,67 @@ func getAllFlags(visitorID *C.char, contextString *C.char) *C.char {
 			context[cKVInfos[0]] = cKVInfos[1]
 		}
 	}
-	fsVisitor, err := fsClient.NewVisitor(C.GoString(visitorID), context)
+	return context
+}
+
+//export getFlagBool
+func getFlagBool(visitorID *C.char, contextString *C.char, key *C.char, defaultValue C.int, activate C.int) C.int {
+	fsVisitor := createVisitor(visitorID, contextString)
+	err := fsVisitor.SynchronizeModifications()
 	if err != nil {
-		fmt.Printf("err: %s\n", err)
-		os.Exit(1)
+		fmt.Printf("err when synchronizing visitor: %s\n", err)
+		return defaultValue
 	}
 
-	err = fsVisitor.SynchronizeModifications()
+	flag, err := fsVisitor.GetModificationBool(C.GoString(key), defaultValue == 1, activate == 1)
+	if err != nil {
+		return defaultValue
+	}
+
+	var ret C.int = 0
+	if flag {
+		ret = 1
+	}
+	return ret
+}
+
+//export getFlagNumber
+func getFlagNumber(visitorID *C.char, contextString *C.char, key *C.char, defaultValue C.double, activate C.int) C.double {
+	fsVisitor := createVisitor(visitorID, contextString)
+	err := fsVisitor.SynchronizeModifications()
+	if err != nil {
+		fmt.Printf("err when synchronizing visitor: %s\n", err)
+		return defaultValue
+	}
+
+	flag, err := fsVisitor.GetModificationNumber(C.GoString(key), float64(defaultValue), activate == 1)
+	if err != nil {
+		return defaultValue
+	}
+	return C.double(flag)
+}
+
+//export getFlagString
+func getFlagString(visitorID *C.char, contextString *C.char, key *C.char, defaultValue *C.char, activate C.int) *C.char {
+	fsVisitor := createVisitor(visitorID, contextString)
+	err := fsVisitor.SynchronizeModifications()
+	if err != nil {
+		fmt.Printf("err when synchronizing visitor: %s\n", err)
+		return defaultValue
+	}
+
+	flag, err := fsVisitor.GetModificationString(C.GoString(key), C.GoString(defaultValue), activate == 1)
+	if err != nil {
+		return defaultValue
+	}
+	return C.CString(flag)
+}
+
+//export getAllFlags
+func getAllFlags(visitorID *C.char, contextString *C.char) *C.char {
+	fsVisitor := createVisitor(visitorID, contextString)
+
+	err := fsVisitor.SynchronizeModifications()
 	if err != nil {
 		fmt.Printf("err: %s\n", err)
 		os.Exit(1)
